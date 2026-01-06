@@ -1,0 +1,89 @@
+<!-- tasks/templates/tasks/home.html -->
+{% extends 'tasks/base.html' %}
+
+{% block title %}Dashboard - TaskFlow{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <header class="page-header">
+        <h1>Dashboard</h1>
+        <p class="subtitle">Welcome back! Here's your task overview.</p>
+    </header>
+
+    <!-- Statistics Cards -->
+    <div class="stats-grid">
+        <div class="stat-card stat-total">
+            <div class="stat-icon">📋</div>
+            <div class="stat-info">
+                <span class="stat-value">{{ total_tasks }}</span>
+                <span class="stat-label">Total Tasks</span>
+            </div>
+        </div>
+        <div class="stat-card stat-todo">
+            <div class="stat-icon">📝</div>
+            <div class="stat-info">
+                <span class="stat-value">{{ todo_count }}</span>
+                <span class="stat-label">To Do</span>
+            </div>
+        </div>
+        <div class="stat-card stat-progress">
+            <div class="stat-icon">⏳</div>
+            <div class="stat-info">
+                <span class="stat-value">{{ in_progress_count }}</span>
+                <span class="stat-label">In Progress</span>
+            </div>
+        </div>
+        <div class="stat-card stat-done">
+            <div class="stat-icon">✅</div>
+            <div class="stat-info">
+                <span class="stat-value">{{ done_count }}</span>
+                <span class="stat-label">Completed</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-grid">
+        <!-- Recent Tasks -->
+        <section class="card recent-tasks">
+            <h2>Recent Tasks</h2>
+            {% if recent_tasks %}
+            <ul class="task-mini-list">
+                {% for task in recent_tasks %}
+                <li class="task-mini-item">
+                    <a href="{% url 'tasks:task_detail' task.pk %}">
+                        <span class="task-status-dot status-{{ task.status|lower }}"></span>
+                        <span class="task-title">{{ task.title }}</span>
+                        <span class="task-priority priority-{{ task.priority }}">
+                            {% if task.priority == 3 %}🔴{% elif task.priority == 2 %}🟡{% else %}🟢{% endif %}
+                        </span>
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+            <a href="{% url 'tasks:task_list' %}" class="view-all">View all tasks →</a>
+            {% else %}
+            <p class="empty-state">No tasks yet. <a href="{% url 'tasks:task_create' %}">Create your first task!</a></p>
+            {% endif %}
+        </section>
+
+        <!-- Categories -->
+        <section class="card categories">
+            <h2>Categories</h2>
+            {% if categories %}
+            <ul class="category-list">
+                {% for category in categories %}
+                <li class="category-item">
+                    <span class="category-color" style="background-color: {{ category.color }}"></span>
+                    <span class="category-name">{{ category.name }}</span>
+                    <span class="category-count">{{ category.task_count }}</span>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="empty-state">No categories yet. Create one in the <a href="{% url 'admin:index' %}">admin panel</a>.</p>
+            {% endif %}
+        </section>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,106 @@
+<!-- tasks/templates/tasks/task_form.html -->
+{% extends 'tasks/base.html' %}
+
+{% block title %}{% if is_update %}Edit{% else %}Create{% endif %} Task - TaskFlow{% endblock %}
+
+{% block content %}
+<div class="task-form-page">
+    <nav class="breadcrumb">
+        <a href="{% url 'tasks:home' %}">Home</a>
+        <span>/</span>
+        <a href="{% url 'tasks:task_list' %}">Tasks</a>
+        <span>/</span>
+        <span>{% if is_update %}Edit Task{% else %}New Task{% endif %}</span>
+    </nav>
+
+    <div class="form-container card">
+        <header class="form-header">
+            <h1>{% if is_update %}Edit Task{% else %}Create New Task{% endif %}</h1>
+            <p>{% if is_update %}Update the task details below.{% else %}Fill in the details to create a new task.{% endif %}</p>
+        </header>
+
+        <form method="post" class="task-form">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="title">Title <span class="required">*</span></label>
+                <input 
+                    type="text" 
+                    id="title" 
+                    name="title" 
+                    value="{% if task %}{{ task.title }}{% endif %}"
+                    placeholder="Enter task title..."
+                    required
+                    autofocus
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea 
+                    id="description" 
+                    name="description" 
+                    rows="4"
+                    placeholder="Add a description (optional)..."
+                >{% if task %}{{ task.description }}{% endif %}</textarea>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="status">Status</label>
+                    <select id="status" name="status">
+                        {% for value, label in status_choices %}
+                        <option value="{{ value }}" {% if task and task.status == value %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="priority">Priority</label>
+                    <select id="priority" name="priority">
+                        {% for value, label in priority_choices %}
+                        <option value="{{ value }}" {% if task and task.priority == value %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="category">Category</label>
+                    <select id="category" name="category">
+                        <option value="">No Category</option>
+                        {% for cat in categories %}
+                        <option value="{{ cat.id }}" {% if task and task.category_id == cat.id %}selected{% endif %}>
+                            {{ cat.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="due_date">Due Date</label>
+                    <input 
+                        type="date" 
+                        id="due_date" 
+                        name="due_date"
+                        value="{% if task and task.due_date %}{{ task.due_date|date:'Y-m-d' }}{% endif %}"
+                    >
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    {% if is_update %}Update Task{% else %}Create Task{% endif %}
+                </button>
+                <a href="{% url 'tasks:task_list' %}" class="btn btn-outline">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+

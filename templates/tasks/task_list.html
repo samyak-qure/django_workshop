@@ -1,0 +1,130 @@
+<!-- tasks/templates/tasks/task_list.html -->
+{% extends 'tasks/base.html' %}
+
+{% block title %}All Tasks - TaskFlow{% endblock %}
+
+{% block content %}
+<div class="task-list-page">
+    <header class="page-header">
+        <div class="header-content">
+            <h1>All Tasks</h1>
+            <a href="{% url 'tasks:task_create' %}" class="btn btn-primary">+ New Task</a>
+        </div>
+    </header>
+
+    <!-- Filters -->
+    <div class="filters card">
+        <form method="get" class="filter-form">
+            <div class="filter-group">
+                <label for="search">Search</label>
+                <input type="text" name="search" id="search" value="{{ search_query }}" placeholder="Search tasks...">
+            </div>
+            <div class="filter-group">
+                <label for="status">Status</label>
+                <select name="status" id="status">
+                    <option value="">All Statuses</option>
+                    <option value="TODO" {% if current_status == 'TODO' %}selected{% endif %}>To Do</option>
+                    <option value="IN_PROGRESS" {% if current_status == 'IN_PROGRESS' %}selected{% endif %}>In Progress</option>
+                    <option value="DONE" {% if current_status == 'DONE' %}selected{% endif %}>Done</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="priority">Priority</label>
+                <select name="priority" id="priority">
+                    <option value="">All Priorities</option>
+                    <option value="3" {% if current_priority == '3' %}selected{% endif %}>High</option>
+                    <option value="2" {% if current_priority == '2' %}selected{% endif %}>Medium</option>
+                    <option value="1" {% if current_priority == '1' %}selected{% endif %}>Low</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="category">Category</label>
+                <select name="category" id="category">
+                    <option value="">All Categories</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat.id }}" {% if current_category == cat.id|stringformat:'i' %}selected{% endif %}>{{ cat.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="filter-actions">
+                <button type="submit" class="btn btn-secondary">Filter</button>
+                <a href="{% url 'tasks:task_list' %}" class="btn btn-outline">Clear</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Task Grid -->
+    {% if tasks %}
+    <div class="task-grid">
+        {% for task in tasks %}
+        <article class="task-card {% if task.is_overdue %}overdue{% endif %}">
+            <div class="task-card-header">
+                <span class="task-status status-{{ task.status|lower }}">{{ task.get_status_display }}</span>
+                <span class="task-priority priority-{{ task.priority }}">
+                    {% if task.priority == 3 %}High{% elif task.priority == 2 %}Medium{% else %}Low{% endif %}
+                </span>
+            </div>
+            <h3 class="task-card-title">
+                <a href="{% url 'tasks:task_detail' task.pk %}">{{ task.title }}</a>
+            </h3>
+            {% if task.description %}
+            <p class="task-card-desc">{{ task.description|truncatewords:20 }}</p>
+            {% endif %}
+            <div class="task-card-footer">
+                {% if task.category %}
+                <span class="task-category" style="background-color: {{ task.category.color }}20; color: {{ task.category.color }}">
+                    {{ task.category.name }}
+                </span>
+                {% endif %}
+                {% if task.due_date %}
+                <span class="task-due {% if task.is_overdue %}overdue{% endif %}">
+                    📅 {{ task.due_date|date:"M d, Y" }}
+                </span>
+                {% endif %}
+            </div>
+            <div class="task-card-actions">
+                <a href="{% url 'tasks:task_update' task.pk %}" class="btn btn-sm btn-outline">Edit</a>
+                <button class="btn btn-sm btn-ghost toggle-status" data-task-id="{{ task.pk }}">
+                    Toggle Status
+                </button>
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state-large">
+        <div class="empty-icon">📭</div>
+        <h2>No tasks found</h2>
+        <p>{% if search_query or current_status or current_category or current_priority %}Try adjusting your filters or {% endif %}<a href="{% url 'tasks:task_create' %}">create a new task</a>.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.querySelectorAll('.toggle-status').forEach(button => {
+    button.addEventListener('click', async function() {
+        const taskId = this.dataset.taskId;
+        const csrfToken = '{{ csrf_token }}';
+        
+        try {
+            const response = await fetch(`/tasks/${taskId}/toggle/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                    'Content-Type': 'application/json',
+                },
+            });
+            
+            if (response.ok) {
+                location.reload();
+            }
+        } catch (error) {
+            console.error('Error toggling status:', error);
+        }
+    });
+});
+</script>
+{% endblock %}
+

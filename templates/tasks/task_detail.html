@@ -1,0 +1,78 @@
+<!-- tasks/templates/tasks/task_detail.html -->
+{% extends 'tasks/base.html' %}
+
+{% block title %}{{ task.title }} - TaskFlow{% endblock %}
+
+{% block content %}
+<div class="task-detail-page">
+    <nav class="breadcrumb">
+        <a href="{% url 'tasks:home' %}">Home</a>
+        <span>/</span>
+        <a href="{% url 'tasks:task_list' %}">Tasks</a>
+        <span>/</span>
+        <span>{{ task.title|truncatewords:5 }}</span>
+    </nav>
+
+    <article class="task-detail card">
+        <header class="task-detail-header">
+            <div class="task-meta">
+                <span class="task-status status-{{ task.status|lower }}">{{ task.get_status_display }}</span>
+                <span class="task-priority priority-{{ task.priority }}">
+                    {% if task.priority == 3 %}🔴 High{% elif task.priority == 2 %}🟡 Medium{% else %}🟢 Low{% endif %} Priority
+                </span>
+                {% if task.is_overdue %}
+                <span class="overdue-badge">⚠️ Overdue</span>
+                {% endif %}
+            </div>
+            <h1>{{ task.title }}</h1>
+        </header>
+
+        <div class="task-detail-body">
+            {% if task.description %}
+            <section class="task-section">
+                <h2>Description</h2>
+                <p>{{ task.description|linebreaks }}</p>
+            </section>
+            {% endif %}
+
+            <section class="task-info-grid">
+                {% if task.category %}
+                <div class="info-item">
+                    <span class="info-label">Category</span>
+                    <span class="info-value">
+                        <span class="category-dot" style="background-color: {{ task.category.color }}"></span>
+                        {{ task.category.name }}
+                    </span>
+                </div>
+                {% endif %}
+                
+                {% if task.due_date %}
+                <div class="info-item">
+                    <span class="info-label">Due Date</span>
+                    <span class="info-value {% if task.is_overdue %}text-danger{% endif %}">
+                        📅 {{ task.due_date|date:"F d, Y" }}
+                    </span>
+                </div>
+                {% endif %}
+                
+                <div class="info-item">
+                    <span class="info-label">Created</span>
+                    <span class="info-value">{{ task.created_at|date:"F d, Y \a\t H:i" }}</span>
+                </div>
+                
+                <div class="info-item">
+                    <span class="info-label">Last Updated</span>
+                    <span class="info-value">{{ task.updated_at|date:"F d, Y \a\t H:i" }}</span>
+                </div>
+            </section>
+        </div>
+
+        <footer class="task-detail-actions">
+            <a href="{% url 'tasks:task_update' task.pk %}" class="btn btn-primary">Edit Task</a>
+            <a href="{% url 'tasks:task_delete' task.pk %}" class="btn btn-danger">Delete Task</a>
+            <a href="{% url 'tasks:task_list' %}" class="btn btn-outline">Back to List</a>
+        </footer>
+    </article>
+</div>
+{% endblock %}
+

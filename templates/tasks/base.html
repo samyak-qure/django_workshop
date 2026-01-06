@@ -1,0 +1,67 @@
+<!-- tasks/templates/tasks/base.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Task Manager{% endblock %}</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'tasks/css/styles.css' %}">
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <a href="{% url 'tasks:home' %}" class="logo">
+                <span class="logo-icon">✓</span>
+                TaskFlow
+            </a>
+            <ul class="nav-links">
+                <li><a href="{% url 'tasks:home' %}" {% if request.resolver_match.url_name == 'home' %}class="active"{% endif %}>Dashboard</a></li>
+                <li><a href="{% url 'tasks:task_list' %}" {% if request.resolver_match.url_name == 'task_list' %}class="active"{% endif %}>Tasks</a></li>
+                <li><a href="{% url 'tasks:task_create' %}" class="btn btn-primary btn-sm">+ New Task</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="messages container">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+            <button class="alert-close" onclick="this.parentElement.remove()">×</button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>TaskFlow &copy; 2026 - Built with Django</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="{% static 'tasks/js/main.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
+

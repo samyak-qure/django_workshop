@@ -1,0 +1,22 @@
+<!-- tasks/templates/tasks/task_confirm_delete.html -->
+{% extends 'tasks/base.html' %}
+
+{% block title %}Delete Task - TaskFlow{% endblock %}
+
+{% block content %}
+<div class="delete-page">
+    <div class="delete-card card">
+        <div class="delete-icon">🗑️</div>
+        <h1>Delete Task</h1>
+        <p>Are you sure you want to delete <strong>"{{ task.title }}"</strong>?</p>
+        <p class="warning">This action cannot be undone.</p>
+        
+        <form method="post" class="delete-actions">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Yes, Delete</button>
+            <a href="{% url 'tasks:task_detail' task.pk %}" class="btn btn-outline">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
