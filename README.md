@@ -59,7 +59,7 @@ django_workshop/
 ```bash
 # Clone the repository
 cd ~
-git clone <repository-url> django_workshop
+git clone https://github.com/samyak-qure/django_workshop.git
 cd django_workshop
 ```
 
@@ -630,9 +630,6 @@ urlpatterns = [
     
     # API endpoint
     path('tasks/<int:pk>/toggle/', views.toggle_task_status, name='task_toggle'),
-    
-    # Class-Based Views (alternative)
-    path('tasks-cbv/', views.TaskListView.as_view(), name='task_list_cbv'),
 ]
 ```
 
@@ -661,15 +658,11 @@ urlpatterns = [
 Now it's time to use the pre-built templates and static files from this repository!
 
 ```bash
-# Create the directories inside the tasks app
-mkdir -p tasks/templates
-mkdir -p tasks/static
-
-# Copy the pre-built templates to the tasks app
-cp -r templates/tasks tasks/templates/
+# Move the pre-built templates to the tasks app
+mv templates tasks/
 
 # Copy the pre-built static files to the tasks app
-cp -r static/tasks tasks/static/
+mv static tasks/
 
 # Verify the structure
 ls -la tasks/templates/tasks/
